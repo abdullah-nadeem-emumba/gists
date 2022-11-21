@@ -13,9 +13,12 @@ const StyledDivWrapper = styled.div`
 export default function CardView({ gists, onCardClick }) {
   return (
     <StyledDivWrapper>
-      {gists.length > 0 &&
+      {gists &&
+        gists.length > 0 &&
         gists.map((item) => {
-          return <GistCard item={item} onCardClick={onCardClick} />;
+          return (
+            <GistCard key={item.id} item={item} onCardClick={onCardClick} />
+          );
         })}
     </StyledDivWrapper>
   );

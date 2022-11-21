@@ -8,6 +8,7 @@ import CardView from "../views/CardView";
 import GistScreen from "./GistScreen";
 import { Pagination } from "@mui/material";
 import axios from "axios";
+import { useNavigation } from "react-router-dom";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -33,40 +34,56 @@ const LIST = "LIST";
 
 export default function LandingScreen() {
   const [viewType, setViewType] = useState("LIST");
-  const [openGist, setOpenGist] = useState(false);
+
   const [gists, setGists] = useState();
+  const [page, setPage] = useState(1);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleNextPage = () => {
+    setPage(page + 1);
+  };
+
+  //   const openGistDetails = (id) => {
+  //     navigate("/creategist", {});
+  //   };
 
   useEffect(() => {
     getGists();
-  }, []);
+  }, [page, viewType]);
 
   const getGists = async () => {
-    const { data } = await axios.get("https://api.github.com/gists/public");
+    const response = await axios.get(
+      `https://api.github.com/gists/public?per_page=${
+        viewType === CARD ? "9" : "10"
+      }&page=${page}  `
+    );
+    console.log(response);
+    const data = response.data;
     if (data.length > 0) {
       setGists(data);
     }
-    console.log(data);
   };
 
-  return openGist ? (
-    <GistScreen />
-  ) : (
+  return (
     <div>
       <ToggleView viewType={viewType} setViewType={setViewType} />
-      {viewType === LIST && (
-        <TableView gists={gists} onRowClick={() => setOpenGist(true)} />
-      )}
-      {viewType === CARD && (
-        <CardView gists={gists} onCardClick={() => setOpenGist(true)} />
-      )}
+      {viewType === LIST && <TableView gists={gists} />}
+      {viewType === CARD && <CardView gists={gists} />}
       <StyledFooter>
         <StyledDiv>
-          <Button type="dark">
+          <Button onClick={handleNextPage} type="dark">
             Next Page <ArrowForwardIcon sx={{ marginLeft: ".2em" }} />
           </Button>
         </StyledDiv>
         <PaginationDiv>
-          <Pagination count={10} />
+          <Pagination
+            page={page}
+            count={gists?.length}
+            onChange={handleChangePage}
+          />
         </PaginationDiv>
       </StyledFooter>
     </div>

@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Typography, Card } from "@mui/material";
 import UserInfo from "../components/UserInfo/UserInfo";
 import DeleteIcon from "@mui/icons-material/Delete";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import ArrowsBox from "../components/ArrowsBox/ArrowsBox";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const GistScreenContainer = styled.div`
   display: grid;
@@ -61,7 +64,18 @@ const CardContent = styled.div`
   overflow-y: scroll;
 `;
 
-export default function GistScreen() {
+export default function GistScreen({}) {
+  const [gist, setGist] = useState();
+  const { state } = useLocation();
+  useEffect(() => {
+    getGistDetails();
+  }, []);
+
+  const getGistDetails = async () => {
+    const response = axios.get(`https://api.github.com/gists/${state.id}`);
+    console.log(response);
+  };
+
   return (
     <GistScreenContainer>
       <StyledHeaderDiv>

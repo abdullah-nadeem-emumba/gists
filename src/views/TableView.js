@@ -42,142 +42,53 @@ const FlexDiv = styled.div`
   column-gap: 1em;
 `;
 
-const StyledDiv = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  width: 50%;
-`;
+// const StyledDiv = styled.div`
+//   display: flex;
+//   justify-content: flex-end;
+//   width: 50%;
+// `;
 
-const PaginationDiv = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  width: 50%;
+// const PaginationDiv = styled.div`
+//   display: flex;
+//   justify-content: flex-end;
+//   align-items: center;
+//   width: 50%;
 
-  & .MuiButtonBase-root {
-    padding: 0;
-    background-color: #5acba1;
-    border-radius: 15%;
-    margin-left: 0.05em;
-  }
+//   & .MuiButtonBase-root {
+//     padding: 0;
+//     background-color: #5acba1;
+//     border-radius: 15%;
+//     margin-left: 0.05em;
+//   }
 
-  & .MuiButtonBase-root:hover {
-    background-color: #5acba1;
-  }
+//   & .MuiButtonBase-root:hover {
+//     background-color: #5acba1;
+//   }
 
-  & .MuiButtonBase-root svg {
-    color: #fff;
-  }
+//   & .MuiButtonBase-root svg {
+//     color: #fff;
+//   }
 
-  &
-    .MuiButtonBase-root.Mui-disabled.MuiIconButton-root.Mui-disabled.MuiIconButton-colorInherit.MuiIconButton-sizeMedium.css-zylse7-MuiButtonBase-root-MuiIconButton-root {
-    padding: 0;
-    background-color: #5acba1;
-    color: "#FFF";
-  }
-`;
+//   &
+//     .MuiButtonBase-root.Mui-disabled.MuiIconButton-root.Mui-disabled.MuiIconButton-colorInherit.MuiIconButton-sizeMedium.css-zylse7-MuiButtonBase-root-MuiIconButton-root {
+//     padding: 0;
+//     background-color: #5acba1;
+//     color: "#FFF";
+//   }
+// `;
 
-const StyledTableFooter = styled(TableFooter)`
-  &&& {
-    display: flex;
-    width: 100%;
-    margin-top: 2em;
-  }
-  & .MuiInputBase-root {
-    display: none;
-  }
-`;
-
-function createData(name, date, time, keyword, notebook) {
-  return { name, date, time, keyword, notebook };
-}
-
-const rows = [
-  createData(
-    "William John",
-    "25 Jan 2017",
-    "12:25 PM",
-    "WebServer",
-    "server.xml"
-  ),
-  createData(
-    "William John",
-    "25 Jan 2017",
-    "12:25 PM",
-    "WebServer",
-    "server.xml"
-  ),
-  createData(
-    "William John",
-    "25 Jan 2017",
-    "12:25 PM",
-    "WebServer",
-    "server.xml"
-  ),
-  createData(
-    "William John",
-    "25 Jan 2017",
-    "12:25 PM",
-    "WebServer",
-    "server.xml"
-  ),
-  createData(
-    "William John",
-    "25 Jan 2017",
-    "12:25 PM",
-    "WebServer",
-    "server.xml"
-  ),
-  createData(
-    "William John",
-    "25 Jan 2017",
-    "12:25 PM",
-    "WebServer",
-    "server.xml"
-  ),
-  createData(
-    "William John",
-    "25 Jan 2017",
-    "12:25 PM",
-    "WebServer",
-    "server.xml"
-  ),
-  createData(
-    "William John",
-    "25 Jan 2017",
-    "12:25 PM",
-    "WebServer",
-    "server.xml"
-  ),
-  createData(
-    "William John",
-    "25 Jan 2017",
-    "12:25 PM",
-    "WebServer",
-    "server.xml"
-  ),
-  createData(
-    "William John",
-    "25 Jan 2017",
-    "12:25 PM",
-    "WebServer",
-    "server.xml"
-  ),
-  createData(
-    "William John",
-    "25 Jan 2017",
-    "12:25 PM",
-    "WebServer",
-    "server.xml"
-  ),
-];
+// const StyledTableFooter = styled(TableFooter)`
+//   &&& {
+//     display: flex;
+//     width: 100%;
+//     margin-top: 2em;
+//   }
+//   & .MuiInputBase-root {
+//     display: none;
+//   }
+// `;
 
 export default function TableView({ gists, onRowClick }) {
-  const [page, setPage] = useState(0);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
   return (
     <>
       <TableContainer sx={{ marginTop: "2em" }} component={Paper}>
@@ -199,7 +110,8 @@ export default function TableView({ gists, onRowClick }) {
           </TableHead>
           <TableBody>
             {React.Children.toArray(
-              gists.length > 0 &&
+              gists &&
+                gists.length > 0 &&
                 gists.map((row) => (
                   <TableRow
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
