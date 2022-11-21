@@ -1,11 +1,6 @@
 import React from "react";
-import { WhiteButton, GreenButton } from "./Button.styles";
+import { StyledButton } from "./Button.styles";
 
-export default function Button({ children, color }) {
-  switch (color) {
-    case "white":
-      return <WhiteButton>{children}</WhiteButton>;
-    case "green":
-      return <GreenButton>{children}</GreenButton>;
-  }
+export default function Button({ children, type }) {
+  return <StyledButton type={type}>{children}</StyledButton>;
 }
