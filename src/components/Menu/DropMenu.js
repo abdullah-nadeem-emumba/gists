@@ -14,12 +14,13 @@ const StyledLink = styled(Link)`
   color: unset;
 `;
 
-export default function DropMenu({ open, onClose }) {
+export default function DropMenu({ open, onClose, anchorEl }) {
   return (
     <Menu
+      anchorEl={anchorEl}
       open={open}
       onClose={onClose}
-      sx={{ top: "10%", left: "-5%", width: "16em" }}
+      sx={{ top: "5%", width: "16em" }}
       anchorOrigin={{
         vertical: "top",
         horizontal: "right",
