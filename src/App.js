@@ -16,6 +16,7 @@ function App() {
           <Route path="/" element={<LandingScreen />} />
           <Route path="/create" element={<CreateGist />} />
           <Route path="/profile" element={<UserProfile />} />
+          <Route path="/gistdetails" element={<GistScreen />} />
         </Routes>
       </Container>
     </div>

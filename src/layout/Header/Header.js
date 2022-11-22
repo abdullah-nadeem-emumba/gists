@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { StyledHeader } from "./Header.styles";
 import TextField from "../../components/TextField/TextField";
 import { Avatar, Typography } from "@mui/material";
 import Button from "../../components/Button/Button";
+import DropMenu from "../../components/Menu/DropMenu";
 import styled from "styled-components";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -17,22 +19,40 @@ const LeftDiv = styled.div`
   align-items: center;
 `;
 
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: unset;
+`;
+
 export default function Header() {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   return (
     <StyledHeader>
       <LeftDiv>
-        <Typography variant="h4">EMUMBA</Typography>
+        <Typography variant="h4">
+          <StyledLink to="/">EMUMBA</StyledLink>
+        </Typography>
       </LeftDiv>
       <RightDiv>
         <TextField
-          type="light"
+          customstyle="light"
           label="Search Notes..."
           variant="outlined"
           icon={<SearchIcon sx={{ color: "white" }} />}
-          color="WHITE"
         />
         {/* <Button type="light">Login</Button> */}
-        <Avatar sx={{ width: "2.9em", height: "2.9em", cursor: "pointer" }} />
+        <Avatar
+          onClick={handleOpen}
+          sx={{ width: "2.9em", height: "2.9em", cursor: "pointer" }}
+        />
+        <DropMenu anchorEl={anchorEl} open={open} onClose={handleClose} />
       </RightDiv>
     </StyledHeader>
   );

@@ -38,11 +38,11 @@ const StyledCard = styled(Card)`
   height: 50em;
 `;
 
-export default function UserGist() {
+export default function UserGist({ item }) {
   return (
     <>
       <UpperDiv>
-        <UserInfo />
+        <UserInfo item={item} />
         <StyledDiv>
           <EachDiv>
             <StarBorderIcon sx={{ color: "#0C76FF" }} />

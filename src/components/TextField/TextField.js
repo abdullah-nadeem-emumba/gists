@@ -1,28 +1,15 @@
 import React from "react";
+import { StyledTextField } from "../FormField/TextField.styles";
 import { InputAdornment } from "@mui/material";
-import { StyledTextField } from "./TextField.styles";
 
-export default function TextField({
-  type,
-  label,
-  variant,
-  icon,
-  fullWidth,
-  size,
-  multiline,
-  rows,
-}) {
+export default function TextField(props) {
   return (
     <StyledTextField
-      type={type}
-      label={label}
-      variant={variant}
-      fullWidth={fullWidth}
-      size={size}
-      multiline={multiline}
-      rows={rows}
+      {...props}
       InputProps={{
-        endAdornment: <InputAdornment position="end">{icon}</InputAdornment>,
+        endAdornment: (
+          <InputAdornment position="end">{props?.icon}</InputAdornment>
+        ),
       }}
     />
   );
