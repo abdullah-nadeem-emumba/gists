@@ -130,7 +130,7 @@ export default function TableView({ gists, onRowClick }) {
                     </TableCell>
 
                     <StyledTableCell
-                      onClick={onRowClick}
+                      onClick={() => onRowClick(row)}
                       sx={{ cursor: "pointer" }}
                     >
                       <FlexDiv>{row.owner.login}</FlexDiv>

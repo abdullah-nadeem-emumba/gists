@@ -14,7 +14,7 @@ const StyledLink = styled(Link)`
   color: unset;
 `;
 
-export default function DropMenu({ open, onClose, anchorEl }) {
+export default function DropMenu({ open, onClose, anchorEl, signout }) {
   return (
     <Menu
       anchorEl={anchorEl}
@@ -55,7 +55,7 @@ export default function DropMenu({ open, onClose, anchorEl }) {
           <ListItemText>Your github profile</ListItemText>
         </StyledMenuItem>
         <StyledMenuItem>
-          <ListItemText>Sign out</ListItemText>
+          <ListItemText onClick={signout}>Sign out</ListItemText>
         </StyledMenuItem>
       </MenuList>
     </Menu>

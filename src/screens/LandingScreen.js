@@ -8,6 +8,7 @@ import CardView from "../views/CardView";
 import GistScreen from "./GistScreen";
 import { Pagination } from "@mui/material";
 import axios from "axios";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useNavigation } from "react-router-dom";
 
 const StyledDiv = styled.div`
@@ -34,9 +35,11 @@ const LIST = "LIST";
 
 export default function LandingScreen() {
   const [viewType, setViewType] = useState("LIST");
-
+  const [loading, setLoading] = useState(false);
   const [gists, setGists] = useState();
   const [page, setPage] = useState(1);
+  const [showDetails, setShowDetails] = useState(false);
+  const [gistDetails, setGistDetails] = useState({});
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -55,6 +58,7 @@ export default function LandingScreen() {
   }, [page, viewType]);
 
   const getGists = async () => {
+    setLoading(true);
     const response = await axios.get(
       `https://api.github.com/gists/public?per_page=${
         viewType === CARD ? "9" : "10"
@@ -65,27 +69,40 @@ export default function LandingScreen() {
     if (data.length > 0) {
       setGists(data);
     }
+    setLoading(false);
   };
 
-  return (
-    <div>
-      <ToggleView viewType={viewType} setViewType={setViewType} />
-      {viewType === LIST && <TableView gists={gists} />}
-      {viewType === CARD && <CardView gists={gists} />}
-      <StyledFooter>
-        <StyledDiv>
-          <Button onClick={handleNextPage} type="dark">
-            Next Page <ArrowForwardIcon sx={{ marginLeft: ".2em" }} />
-          </Button>
-        </StyledDiv>
-        <PaginationDiv>
-          <Pagination
-            page={page}
-            count={gists?.length}
-            onChange={handleChangePage}
-          />
-        </PaginationDiv>
-      </StyledFooter>
-    </div>
-  );
+  const showGistDetails = (gist) => {
+    setGistDetails(gist);
+    setShowDetails(true);
+  };
+
+  const displayScreen = () =>
+    showDetails ? (
+      <GistScreen gistDetails={gistDetails} />
+    ) : (
+      <div>
+        <ToggleView viewType={viewType} setViewType={setViewType} />
+        {viewType === LIST && (
+          <TableView gists={gists} onRowClick={showGistDetails} />
+        )}
+        {viewType === CARD && <CardView gists={gists} />}
+        <StyledFooter>
+          <StyledDiv>
+            <Button onClick={handleNextPage} type="dark">
+              Next Page <ArrowForwardIcon sx={{ marginLeft: ".2em" }} />
+            </Button>
+          </StyledDiv>
+          <PaginationDiv>
+            <Pagination
+              page={page}
+              count={gists?.length}
+              onChange={handleChangePage}
+            />
+          </PaginationDiv>
+        </StyledFooter>
+      </div>
+    );
+
+  return loading ? <CircularProgress /> : <>{displayScreen()}</>;
 }

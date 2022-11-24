@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import TextField from "../components/FormField/FormField";
 import styled from "styled-components";
 import Button from "../components/Button/Button";
 import axios from "axios";
-import { useFormik, ErrorMessage, Formik, Form, Field } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import { TOKEN } from "../constants/constants";
 
 const FormContainer = styled.div`
   margin-top: 3em;
@@ -23,12 +24,6 @@ const StyledDiv = styled.div`
 `;
 
 export default function CreateGist() {
-  const [gistData, setGistData] = useState({
-    filename: "",
-    description: "",
-    content: "",
-  });
-
   const validationSchema = Yup.object({
     filename: Yup.string().required("Required"),
     description: Yup.string()
@@ -45,44 +40,27 @@ export default function CreateGist() {
     content: "",
   };
 
-  const onSubmit = (values) => {
+  const config = {
+    headers: { authorization: `token ${TOKEN}` },
+  };
+
+  const onSubmit = async (values) => {
     console.log(values);
-  };
-
-  // const formik = useFormik({
-  //   initialValues: {},
-  //   onSubmit: (values) => {
-  //     console.log(values);
-  //   },
-  //   validationSchema,
-  // });
-
-  const updateState = (data) => {
-    setGistData({ ...gistData, ...data });
-  };
-
-  const createGist = async () => {
-    const response = await axios.post("https://api.github.com/gists", {
-      description: gistData.description,
-      public: true,
-      files: {
-        [gistData.filename]: {
-          content: gistData.content,
+    const response = await axios.post(
+      "https://api.github.com/gists",
+      {
+        description: values.description,
+        public: true,
+        files: {
+          [values.filename]: {
+            content: values.content,
+          },
         },
       },
-    });
+      config
+    );
     console.log(response);
   };
-
-  const handleChange = (e) => {
-    updateState({ [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = () => {
-    console.log(gistData);
-  };
-
-  //console.log(formik.values);
 
   return (
     <Formik
@@ -125,7 +103,6 @@ export default function CreateGist() {
               rows={10}
               fullWidth
             />
-            {/* <ErrorMessage name="content" /> */}
           </div>
           <StyledDiv>
             <Button customstyle="dark">Add File</Button>

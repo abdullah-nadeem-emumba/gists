@@ -7,6 +7,7 @@ import Button from "../../components/Button/Button";
 import DropMenu from "../../components/Menu/DropMenu";
 import styled from "styled-components";
 import SearchIcon from "@mui/icons-material/Search";
+import { TOKEN } from "../../constants/constants";
 
 const RightDiv = styled.div`
   display: flex;
@@ -25,6 +26,7 @@ const StyledLink = styled(Link)`
 `;
 
 export default function Header() {
+  const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token"));
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleOpen = (event) => {
@@ -33,6 +35,18 @@ export default function Header() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const login = () => {
+    localStorage.setItem("token", TOKEN);
+    setLoggedIn(TOKEN);
+  };
+
+  const signout = () => {
+    localStorage.removeItem("token");
+    setLoggedIn("");
+    setAnchorEl(null);
+  };
+
   return (
     <StyledHeader>
       <LeftDiv>
@@ -47,12 +61,22 @@ export default function Header() {
           variant="outlined"
           icon={<SearchIcon sx={{ color: "white" }} />}
         />
-        {/* <Button type="light">Login</Button> */}
-        <Avatar
-          onClick={handleOpen}
-          sx={{ width: "2.9em", height: "2.9em", cursor: "pointer" }}
+        {!loggedIn ? (
+          <Button onClick={login} customstyle="light">
+            Login
+          </Button>
+        ) : (
+          <Avatar
+            onClick={handleOpen}
+            sx={{ width: "2.9em", height: "2.9em", cursor: "pointer" }}
+          />
+        )}
+        <DropMenu
+          signout={signout}
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
         />
-        <DropMenu anchorEl={anchorEl} open={open} onClose={handleClose} />
       </RightDiv>
     </StyledHeader>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Typography, Card } from "@mui/material";
+import { Typography, Card, CircularProgress } from "@mui/material";
 import UserInfo from "../components/UserInfo/UserInfo";
 import DeleteIcon from "@mui/icons-material/Delete";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -11,7 +11,7 @@ import { useLocation } from "react-router-dom";
 
 const GistScreenContainer = styled.div`
   display: grid;
-  grid-template-rows: 5.5em 55em;
+  grid-template-rows: 5.5em 50em;
   padding: 0 4.8em;
 `;
 
@@ -64,22 +64,103 @@ const CardContent = styled.div`
   overflow-y: scroll;
 `;
 
-export default function GistScreen({}) {
-  const [gist, setGist] = useState();
-  const { state } = useLocation();
-  useEffect(() => {
-    getGistDetails();
-  }, []);
+const StyledText = styled(Typography)`
+  &&& {
+    font-size: 0.9em;
+  }
+`;
 
-  const getGistDetails = async () => {
-    const response = axios.get(`https://api.github.com/gists/${state.id}`);
-    console.log(response);
+const LineNumberText = styled(Typography)`
+  margin-right: 1.5em;
+  color: #a7a7a7;
+  &&& {
+    font-size: 0.9em;
+  }
+`;
+
+const FlexDiv = styled.div`
+  display: flex;
+  column-gap: 1.2em;
+  overflow: hidden;
+  max-height: 1.5em;
+`;
+
+const CenterDiv = styled.div`
+  width: inherit;
+  height: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export default function GistScreen({ gistDetails }) {
+  const [filecontent, setFileContent] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  // useEffect(() => {
+  //   getGistDetails();
+  // }, []);
+
+  // const getGistDetails = async () => {
+  //   setLoading(true);
+  //   const response = await axios.get(`https://api.github.com/gists/${gistID}`);
+  //   console.log(response);
+  //   setGist(response.data);
+  //   setLoading(false);
+  // };
+
+  const formatFileContent = (content) => {
+    return content.split(/\r?\n/);
   };
 
-  return (
+  useEffect(() => {
+    getFileContent();
+  }, []);
+
+  const getFileContent = async () => {
+    if (gistDetails) {
+      setLoading(true);
+      try {
+        const filename = Object.keys(gistDetails.files)[0];
+        const response = await axios.get(gistDetails.files[filename].raw_url);
+        const result = formatFileContent(response.data);
+        setFileContent(result);
+      } catch (e) {
+        setError(e);
+      }
+      setLoading(false);
+    }
+  };
+
+  const filename = Object.keys(gistDetails.files)[0];
+  //const filecontent = formatFileContent(gistDetails.files[filename]);
+
+  const displayFileContent = () => {
+    if (error) {
+      return (
+        <CenterDiv>
+          <Typography>Unable to load gist...</Typography>
+        </CenterDiv>
+      );
+    } else if (filecontent.length > 0) {
+      return filecontent.map((line, index) => {
+        return (
+          <FlexDiv>
+            {" "}
+            <LineNumberText>{index + 1}</LineNumberText>
+            <StyledText>{line}</StyledText>
+          </FlexDiv>
+        );
+      });
+    }
+  };
+
+  return loading ? (
+    <CircularProgress />
+  ) : (
     <GistScreenContainer>
       <StyledHeaderDiv>
-        <UserInfo />
+        <UserInfo item={gistDetails} />
         <HeaderRightDiv>
           <EachDiv>
             <DeleteIcon sx={{ color: "#0C76FF" }} />
@@ -126,9 +207,9 @@ export default function GistScreen({}) {
       <StyledGistCard elevation={5}>
         <CardHeader>
           <ArrowsBox />
-          <Typography color={"#0C76FF"}>gistfile1.m</Typography>
+          <Typography color={"#0C76FF"}>{filename}</Typography>
         </CardHeader>
-        <CardContent></CardContent>
+        <CardContent>{displayFileContent()}</CardContent>
       </StyledGistCard>
     </GistScreenContainer>
   );
