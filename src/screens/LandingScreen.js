@@ -11,6 +11,7 @@ import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
+import { SearchContext } from "../contexts/SearchContext";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -41,6 +42,7 @@ export default function LandingScreen() {
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
+  const { searchResult, setSearchResult } = useContext(SearchContext);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -62,12 +64,22 @@ export default function LandingScreen() {
     getGists();
   }, []);
 
+  // useEffect(() => {
+  //   setGists(searchResult);
+  // }, [searchResult]);
+
+  const config = {
+    headers: { authorization: `token ${user.token}` },
+  };
+
   const getGists = async () => {
+    // if (searchResult && searchResult.length > 0) return;
     setLoading(true);
     const response = await axios.get(
       `https://api.github.com/gists/public?per_page=${
         viewType === CARD ? "9" : "10"
-      }&page=${page} `
+      }&page=${page}`,
+      config
     );
     console.log(response);
     const data = response.data;

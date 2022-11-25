@@ -101,11 +101,12 @@ export default function GistScreen() {
   const [starred, setStarred] = useState(false);
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { files, owner, id } = state;
+  const { files, owner, id, description } = state;
 
   const { user } = useContext(UserContext);
 
   const formatFileContent = (content) => {
+    if (typeof content === "string") return content.split(/\r?\n/);
     return JSON.stringify(content, null, 2).split(/\r?\n/);
   };
 
@@ -167,6 +168,14 @@ export default function GistScreen() {
     }
   };
 
+  const forkGist = async (gistID) => {
+    const response = await axios.post(
+      `https://api.github.com/gists/${gistID}/forks`,
+      config
+    );
+    console.log(response);
+  };
+
   const toggleStar = async (gistID) => {
     if (!starred) {
       const response = await axios.put(
@@ -200,13 +209,19 @@ export default function GistScreen() {
     }
   };
 
+  const editGist = () => {
+    navigate("/create", {
+      state: { content: filecontent, filename, description, id },
+    });
+  };
+
   const showGistActions = () => {
     return user ? (
       <HeaderRightDiv>
         {user.username === owner.login && (
           <>
             {" "}
-            <EachDiv>
+            <EachDiv onClick={editGist}>
               <DeleteIcon sx={{ color: "#0C76FF" }} />
               <Typography color={"#0C76FF"}>Edit</Typography>
             </EachDiv>
@@ -236,7 +251,7 @@ export default function GistScreen() {
             </Typography>
           </BorderedDiv>
         </EachDiv>
-        <EachDiv>
+        <EachDiv onClick={() => forkGist(id)}>
           <StarBorderIcon sx={{ color: "#0C76FF" }} />
           <Typography color={"#0C76FF"}>Fork</Typography>
           <BorderedDiv>

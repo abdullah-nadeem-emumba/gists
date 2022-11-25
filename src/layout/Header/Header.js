@@ -1,14 +1,15 @@
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { StyledHeader } from "./Header.styles";
-import TextField from "../../components/TextField/TextField";
+import SearchField from "../../components/SearchField/SearchField";
 import { Avatar, Typography } from "@mui/material";
 import Button from "../../components/Button/Button";
 import DropMenu from "../../components/Menu/DropMenu";
 import styled from "styled-components";
-import SearchIcon from "@mui/icons-material/Search";
 import { USER } from "../../constants/constants";
 import { UserContext } from "../../contexts/UserContext";
+import { SearchContext } from "../../contexts/SearchContext";
+import axios from "axios";
 
 const RightDiv = styled.div`
   display: flex;
@@ -27,8 +28,10 @@ const StyledLink = styled(Link)`
 `;
 
 export default function Header() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [searchVal, setSearchVal] = useState("");
   const { user, setUser } = useContext(UserContext);
+  const { searchResult, setSearchResult } = useContext(SearchContext);
   const open = Boolean(anchorEl);
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -48,6 +51,18 @@ export default function Header() {
     setAnchorEl(null);
   };
 
+  const getUserGists = async () => {
+    try {
+      const response = await axios.get(
+        `https://api.github.com/users/${searchVal}/gists`
+      );
+      console.log(response);
+      setSearchResult(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <StyledHeader>
       <LeftDiv>
@@ -56,11 +71,14 @@ export default function Header() {
         </Typography>
       </LeftDiv>
       <RightDiv>
-        <TextField
+        <SearchField
+          value={searchVal}
+          onChange={(e) => setSearchVal(e.target.value)}
+          handleSearch={getUserGists}
           customstyle="light"
           label="Search Notes..."
           variant="outlined"
-          icon={<SearchIcon sx={{ color: "white" }} />}
+          placeholder="Search Notes..."
         />
         {!user ? (
           <Button onClick={login} customstyle="light">

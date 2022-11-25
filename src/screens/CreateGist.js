@@ -6,7 +6,7 @@ import axios from "axios";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { USER } from "../constants/constants";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const FormContainer = styled.div`
   margin-top: 3em;
@@ -26,6 +26,9 @@ const StyledDiv = styled.div`
 
 export default function CreateGist() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+
+  console.log("State", state);
 
   const validationSchema = Yup.object({
     filename: Yup.string().required("Required"),
@@ -42,25 +45,51 @@ export default function CreateGist() {
     description: "",
     content: "",
   };
+  const formatFileContent = (content) => {
+    return content.join("\n");
+  };
+
+  if (state) {
+    initialValues.description = state.description;
+    initialValues.filename = state.filename;
+    initialValues.content = formatFileContent(state.content);
+  }
 
   const config = {
     headers: { authorization: `token ${USER.token}` },
   };
 
   const onSubmit = async (values) => {
-    const response = await axios.post(
-      "https://api.github.com/gists",
-      {
-        description: values.description,
-        public: true,
-        files: {
-          [values.filename]: {
-            content: values.content,
+    if (state) {
+      const response = await axios.patch(
+        `https://api.github.com/gists/${state.id}`,
+        {
+          gist_id: state.id,
+          description: values.description,
+          files: {
+            [values.filename]: {
+              content: values.content,
+            },
           },
         },
-      },
-      config
-    );
+        config
+      );
+      console.log(response);
+    } else {
+      const response = await axios.post(
+        "https://api.github.com/gists",
+        {
+          description: values.description,
+          public: true,
+          files: {
+            [values.filename]: {
+              content: values.content,
+            },
+          },
+        },
+        config
+      );
+    }
     navigate("/");
   };
 
@@ -109,7 +138,7 @@ export default function CreateGist() {
           <StyledDiv>
             <Button customstyle="dark">Add File</Button>
             <Button type={"submit"} customstyle="dark">
-              Create Gist
+              {state ? "Update Gist" : "Create Gist"}
             </Button>
           </StyledDiv>
         </FormContainer>
