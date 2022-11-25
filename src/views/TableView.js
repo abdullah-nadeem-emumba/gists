@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import {
   Table,
   TableBody,
@@ -6,16 +6,14 @@ import {
   TableCell,
   TableRow,
   TableContainer,
-  TableFooter,
-  TablePagination,
   Paper,
   Avatar,
 } from "@mui/material";
 import styled from "styled-components";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
 import Checkbox from "../components/Checkbox/Checkbox";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import Button from "../components/Button/Button";
+import { UserContext } from "../contexts/UserContext";
+import TableStar from "../components/TableStar/TableStar";
+import moment from "moment";
 
 const StyledHeaderRow = styled(TableRow)`
   &&& {
@@ -42,53 +40,9 @@ const FlexDiv = styled.div`
   column-gap: 1em;
 `;
 
-// const StyledDiv = styled.div`
-//   display: flex;
-//   justify-content: flex-end;
-//   width: 50%;
-// `;
-
-// const PaginationDiv = styled.div`
-//   display: flex;
-//   justify-content: flex-end;
-//   align-items: center;
-//   width: 50%;
-
-//   & .MuiButtonBase-root {
-//     padding: 0;
-//     background-color: #5acba1;
-//     border-radius: 15%;
-//     margin-left: 0.05em;
-//   }
-
-//   & .MuiButtonBase-root:hover {
-//     background-color: #5acba1;
-//   }
-
-//   & .MuiButtonBase-root svg {
-//     color: #fff;
-//   }
-
-//   &
-//     .MuiButtonBase-root.Mui-disabled.MuiIconButton-root.Mui-disabled.MuiIconButton-colorInherit.MuiIconButton-sizeMedium.css-zylse7-MuiButtonBase-root-MuiIconButton-root {
-//     padding: 0;
-//     background-color: #5acba1;
-//     color: "#FFF";
-//   }
-// `;
-
-// const StyledTableFooter = styled(TableFooter)`
-//   &&& {
-//     display: flex;
-//     width: 100%;
-//     margin-top: 2em;
-//   }
-//   & .MuiInputBase-root {
-//     display: none;
-//   }
-// `;
-
 export default function TableView({ gists, onRowClick }) {
+  const { user } = useContext(UserContext);
+
   return (
     <>
       <TableContainer sx={{ marginTop: "2em" }} component={Paper}>
@@ -112,61 +66,46 @@ export default function TableView({ gists, onRowClick }) {
             {React.Children.toArray(
               gists &&
                 gists.length > 0 &&
-                gists.map((row) => (
-                  <TableRow
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <TableCell sx={{ width: ".1em", paddingRight: ".2em" }}>
-                      <Checkbox />
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        width: ".1em",
-                        paddingRight: ".2em",
-                        paddingLeft: ".2em",
-                      }}
+                gists.map((row) => {
+                  const date = moment(row.created_at).format("D MMM YYYY");
+                  const time = moment(row.created_at).format("h:mm A");
+                  return (
+                    <TableRow
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
-                      <Avatar src={row.owner.avatar_url} />
-                    </TableCell>
+                      <TableCell sx={{ width: ".1em", paddingRight: ".2em" }}>
+                        <Checkbox />
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          width: ".1em",
+                          paddingRight: ".2em",
+                          paddingLeft: ".2em",
+                        }}
+                      >
+                        <Avatar src={row.owner.avatar_url} />
+                      </TableCell>
 
-                    <StyledTableCell
-                      onClick={() => onRowClick(row)}
-                      sx={{ cursor: "pointer" }}
-                    >
-                      <FlexDiv>{row.owner.login}</FlexDiv>
-                    </StyledTableCell>
-                    <StyledTableCell>{row.created_at}</StyledTableCell>
-                    <StyledTableCell>{row.updated_at}</StyledTableCell>
-                    <StyledTableCell>{row.keyword}</StyledTableCell>
-                    <StyledTableCell>{row.notebook}</StyledTableCell>
-                    <StyledTableCell>
-                      <StarBorderIcon
-                        sx={{ color: "#5acba1", cursor: "pointer" }}
-                      />
-                    </StyledTableCell>
-                  </TableRow>
-                ))
+                      <StyledTableCell
+                        onClick={() => onRowClick(row)}
+                        sx={{ cursor: "pointer" }}
+                      >
+                        <FlexDiv>{row.owner.login}</FlexDiv>
+                      </StyledTableCell>
+                      <StyledTableCell>{date}</StyledTableCell>
+                      <StyledTableCell>{time}</StyledTableCell>
+                      <StyledTableCell>{"WebServer"}</StyledTableCell>
+                      <StyledTableCell>{row.notebook}</StyledTableCell>
+                      <StyledTableCell>
+                        {user && <TableStar id={row.id} />}
+                      </StyledTableCell>
+                    </TableRow>
+                  );
+                })
             )}
           </TableBody>
         </Table>
       </TableContainer>
-      {/* <StyledTableFooter>
-        <StyledDiv>
-          <Button type="dark">
-            Next Page <ArrowForwardIcon sx={{ marginLeft: ".2em" }} />
-          </Button>
-        </StyledDiv>
-        <PaginationDiv>
-          <TablePagination
-            rowsPerPage={8}
-            component="div"
-            page={page}
-            count={rows.length}
-            labelRowsPerPage={null}
-            onPageChange={handleChangePage}
-          />
-        </PaginationDiv>
-      </StyledTableFooter> */}
     </>
   );
 }

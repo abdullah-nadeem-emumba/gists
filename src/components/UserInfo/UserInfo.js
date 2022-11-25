@@ -14,6 +14,7 @@ const StyledSpan = styled.span`
 `;
 
 export default function UserInfo({ item }) {
+  const filename = Object.keys(item.files)[0];
   return (
     <GistInfoDiv>
       <Avatar
@@ -22,7 +23,8 @@ export default function UserInfo({ item }) {
       />
       <div>
         <Typography align="left" sx={{ color: "#0C76FF", fontWeight: 700 }}>
-          {item.owner.login} / <StyledSpan>package.json</StyledSpan>
+          {item.owner.login} / {filename}
+          <StyledSpan></StyledSpan>
         </Typography>
         <Typography sx={{ color: "#a7a7a7" }} textAlign={"left"}>
           Created {item.created_at}

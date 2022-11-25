@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import UserInfo from "../UserInfo/UserInfo";
 import styled from "styled-components";
 import { Typography, Card } from "@mui/material";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
+import axios from "axios";
 
 const UpperDiv = styled.div`
   display: flex;
@@ -35,10 +36,88 @@ const StyledDiv = styled.div`
 const StyledCard = styled(Card)`
   width: inherit;
   padding: 0.2em 0.7em;
-  height: 50em;
+  min-height: 15em;
+  overflow: hidden;
+`;
+
+const StyledText = styled(Typography)`
+  &&& {
+    font-size: 0.9em;
+  }
+`;
+
+const LineNumberText = styled(Typography)`
+  margin-right: 1.5em;
+  color: #a7a7a7;
+  &&& {
+    font-size: 0.9em;
+  }
+`;
+
+const FlexDiv = styled.div`
+  display: flex;
+  column-gap: 1.2em;
+  overflow: hidden;
+  max-height: 1.5em;
+`;
+
+const CenterDiv = styled.div`
+  width: inherit;
+  height: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default function UserGist({ item }) {
+  const [filecontent, setFileContent] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const formatFileContent = (content) => {
+    return JSON.stringify(content, null, 2).split(/\r?\n/);
+  };
+
+  useEffect(() => {
+    getFileContent();
+  }, []);
+
+  const getFileContent = async () => {
+    if (item) {
+      setLoading(true);
+      try {
+        const filename = Object.keys(item.files)[0];
+        const response = await axios.get(item.files[filename].raw_url);
+        const result = formatFileContent(response.data);
+        setFileContent(result);
+      } catch (e) {
+        setError(e);
+      }
+      setLoading(false);
+    }
+  };
+
+  const displayFileContent = () => {
+    if (error) {
+      return (
+        <CenterDiv>
+          <Typography>Unable to load gist...</Typography>
+        </CenterDiv>
+      );
+    } else if (filecontent.length > 0) {
+      return React.Children.toArray(
+        filecontent.map((line, index) => {
+          return (
+            <FlexDiv>
+              {" "}
+              <LineNumberText>{index + 1}</LineNumberText>
+              <StyledText>{line}</StyledText>
+            </FlexDiv>
+          );
+        })
+      );
+    }
+  };
   return (
     <>
       <UpperDiv>
@@ -78,7 +157,7 @@ export default function UserGist({ item }) {
           </EachDiv>
         </StyledDiv>
       </UpperDiv>
-      <StyledCard elevation={3}></StyledCard>
+      <StyledCard elevation={3}>{displayFileContent()}</StyledCard>
     </>
   );
 }

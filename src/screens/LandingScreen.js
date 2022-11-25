@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import ToggleView from "../components/ToggleView/ToggleView";
 import TableView from "../views/TableView";
 import Button from "../components/Button/Button";
@@ -9,7 +9,8 @@ import GistScreen from "./GistScreen";
 import { Pagination } from "@mui/material";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useNavigation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -38,8 +39,8 @@ export default function LandingScreen() {
   const [loading, setLoading] = useState(false);
   const [gists, setGists] = useState();
   const [page, setPage] = useState(1);
-  const [showDetails, setShowDetails] = useState(false);
-  const [gistDetails, setGistDetails] = useState({});
+  const navigate = useNavigate();
+  const { user } = useContext(UserContext);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -49,20 +50,24 @@ export default function LandingScreen() {
     setPage(page + 1);
   };
 
-  //   const openGistDetails = (id) => {
-  //     navigate("/creategist", {});
-  //   };
+  const openGistDetails = (gist) => {
+    navigate("/gistdetails", { state: { ...gist } });
+  };
 
   useEffect(() => {
     getGists();
   }, [page, viewType]);
+
+  useEffect(() => {
+    getGists();
+  }, []);
 
   const getGists = async () => {
     setLoading(true);
     const response = await axios.get(
       `https://api.github.com/gists/public?per_page=${
         viewType === CARD ? "9" : "10"
-      }&page=${page}  `
+      }&page=${page} `
     );
     console.log(response);
     const data = response.data;
@@ -72,37 +77,30 @@ export default function LandingScreen() {
     setLoading(false);
   };
 
-  const showGistDetails = (gist) => {
-    setGistDetails(gist);
-    setShowDetails(true);
-  };
-
-  const displayScreen = () =>
-    showDetails ? (
-      <GistScreen gistDetails={gistDetails} />
-    ) : (
-      <div>
-        <ToggleView viewType={viewType} setViewType={setViewType} />
-        {viewType === LIST && (
-          <TableView gists={gists} onRowClick={showGistDetails} />
-        )}
-        {viewType === CARD && <CardView gists={gists} />}
-        <StyledFooter>
-          <StyledDiv>
-            <Button onClick={handleNextPage} type="dark">
-              Next Page <ArrowForwardIcon sx={{ marginLeft: ".2em" }} />
-            </Button>
-          </StyledDiv>
-          <PaginationDiv>
-            <Pagination
-              page={page}
-              count={gists?.length}
-              onChange={handleChangePage}
-            />
-          </PaginationDiv>
-        </StyledFooter>
-      </div>
-    );
-
+  const displayScreen = () => (
+    <div>
+      <ToggleView viewType={viewType} setViewType={setViewType} />
+      {viewType === LIST && (
+        <TableView gists={gists} onRowClick={openGistDetails} />
+      )}
+      {viewType === CARD && (
+        <CardView gists={gists} onCardClick={openGistDetails} />
+      )}
+      <StyledFooter>
+        <StyledDiv>
+          <Button onClick={handleNextPage} type="dark">
+            Next Page <ArrowForwardIcon sx={{ marginLeft: ".2em" }} />
+          </Button>
+        </StyledDiv>
+        <PaginationDiv>
+          <Pagination
+            page={page}
+            count={gists?.length}
+            onChange={handleChangePage}
+          />
+        </PaginationDiv>
+      </StyledFooter>
+    </div>
+  );
   return loading ? <CircularProgress /> : <>{displayScreen()}</>;
 }

@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import UserGist from "../components/UserGist/UserGist";
 import { Typography, Avatar, Button } from "@mui/material";
+import axios from "axios";
+import { UserContext } from "../contexts/UserContext";
 
 const GridContainer = styled.div`
   display: grid;
@@ -25,11 +27,38 @@ const RightDiv = styled.div`
   row-gap: 1em;
   padding-left: 2.5em;
   border-left: 1px solid lightgray;
-  height: 80em;
-  overflow-y: auto;
+  margin-bottom: 2em;
+`;
+
+const CenterDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 export default function UserProfile() {
+  const [gists, setGists] = useState([]);
+  const { user } = useContext(UserContext);
+  const owner = gists.length > 0 && gists[0].owner;
+  useEffect(() => {
+    getUserGists();
+  }, []);
+
+  const getUserGists = async () => {
+    const response = await axios.get(
+      `https://api.github.com/users/${user?.username}/gists`
+    );
+    setGists(response.data);
+  };
+
+  const listGists = () => {
+    if (gists.length > 0) {
+      return React.Children.toArray(
+        gists.map((item) => <UserGist item={item} />)
+      );
+    }
+  };
+
   const item = {
     url: "https://api.github.com/gists/b2d4f51abb4d04d2f5a2372b1d2a3571",
     forks_url:
@@ -121,12 +150,12 @@ export default function UserProfile() {
   return (
     <GridContainer>
       <LeftDiv>
-        <div>
+        <CenterDiv>
           <Avatar
-            src={item.owner.avatar_url}
+            src={owner.avatar_url}
             sx={{ width: "12em", height: "12em", marginBottom: "1.7em" }}
           />
-          <Typography variant="h5">Anna John</Typography>
+          <Typography variant="h5">{owner.login}</Typography>
           <Button
             variant="outlined"
             sx={{
@@ -137,13 +166,9 @@ export default function UserProfile() {
           >
             View Github Profile
           </Button>
-        </div>
+        </CenterDiv>
       </LeftDiv>
-      <RightDiv>
-        <UserGist item={item} />
-        <UserGist item={item} />
-        <UserGist item={item} />
-      </RightDiv>
+      <RightDiv>{listGists()}</RightDiv>
     </GridContainer>
   );
 }

@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { Menu, MenuList, Divider, MenuItem, ListItemText } from "@mui/material";
+import { UserContext } from "../../contexts/UserContext";
 import styled from "styled-components";
 
 const StyledMenuItem = styled(MenuItem)`
@@ -15,6 +16,7 @@ const StyledLink = styled(Link)`
 `;
 
 export default function DropMenu({ open, onClose, anchorEl, signout }) {
+  const { user } = useContext(UserContext);
   return (
     <Menu
       anchorEl={anchorEl}
@@ -33,7 +35,7 @@ export default function DropMenu({ open, onClose, anchorEl, signout }) {
       <MenuList sx={{ border: "none", padding: "0 1em" }} dense>
         <ListItemText>Signed in as</ListItemText>
         <StyledMenuItem>
-          <ListItemText>Anna John</ListItemText>
+          <ListItemText>{user?.username}</ListItemText>
         </StyledMenuItem>
         <Divider />
         <StyledMenuItem>

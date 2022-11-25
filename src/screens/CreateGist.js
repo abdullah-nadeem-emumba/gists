@@ -5,7 +5,8 @@ import Button from "../components/Button/Button";
 import axios from "axios";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { TOKEN } from "../constants/constants";
+import { USER } from "../constants/constants";
+import { useNavigate } from "react-router-dom";
 
 const FormContainer = styled.div`
   margin-top: 3em;
@@ -24,6 +25,8 @@ const StyledDiv = styled.div`
 `;
 
 export default function CreateGist() {
+  const navigate = useNavigate();
+
   const validationSchema = Yup.object({
     filename: Yup.string().required("Required"),
     description: Yup.string()
@@ -41,11 +44,10 @@ export default function CreateGist() {
   };
 
   const config = {
-    headers: { authorization: `token ${TOKEN}` },
+    headers: { authorization: `token ${USER.token}` },
   };
 
   const onSubmit = async (values) => {
-    console.log(values);
     const response = await axios.post(
       "https://api.github.com/gists",
       {
@@ -59,7 +61,7 @@ export default function CreateGist() {
       },
       config
     );
-    console.log(response);
+    navigate("/");
   };
 
   return (

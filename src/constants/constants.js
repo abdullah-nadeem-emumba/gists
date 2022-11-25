@@ -1,3 +1,8 @@
 export const CARD = "CARD";
 export const LIST = "LIST";
-export const TOKEN = "abd123";
+const TOKEN = "abd123";
+const USERNAME = "abdullah-nadeem-emumba";
+export const USER = {
+  token: TOKEN,
+  username: USERNAME,
+};

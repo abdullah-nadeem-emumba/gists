@@ -78,7 +78,7 @@ export default function GistCard({ item, onCardClick }) {
   };
 
   const formatFileContent = (content) => {
-    return content.split(/\r?\n/);
+    return JSON.stringify(content, null, 2).split(/\r?\n/);
   };
 
   const displayFileContent = () => {
@@ -89,20 +89,22 @@ export default function GistCard({ item, onCardClick }) {
         </CenterDiv>
       );
     } else if (filecontent.length > 0) {
-      return filecontent.map((line, index) => {
-        return (
-          <FlexDiv>
-            {" "}
-            <LineNumberText>{index + 1}</LineNumberText>
-            <StyledText>{line}</StyledText>
-          </FlexDiv>
-        );
-      });
+      return React.Children.toArray(
+        filecontent.map((line, index) => {
+          return (
+            <FlexDiv>
+              {" "}
+              <LineNumberText>{index + 1}</LineNumberText>
+              <StyledText>{line}</StyledText>
+            </FlexDiv>
+          );
+        })
+      );
     }
   };
 
   return (
-    <StyledCard onClick={onCardClick}>
+    <StyledCard onClick={() => onCardClick(item)}>
       <GistDiv>
         {loading ? (
           <CenterDiv>

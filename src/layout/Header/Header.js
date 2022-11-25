@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { StyledHeader } from "./Header.styles";
 import TextField from "../../components/TextField/TextField";
@@ -7,7 +7,8 @@ import Button from "../../components/Button/Button";
 import DropMenu from "../../components/Menu/DropMenu";
 import styled from "styled-components";
 import SearchIcon from "@mui/icons-material/Search";
-import { TOKEN } from "../../constants/constants";
+import { USER } from "../../constants/constants";
+import { UserContext } from "../../contexts/UserContext";
 
 const RightDiv = styled.div`
   display: flex;
@@ -26,8 +27,8 @@ const StyledLink = styled(Link)`
 `;
 
 export default function Header() {
-  const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token"));
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const { user, setUser } = useContext(UserContext);
   const open = Boolean(anchorEl);
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -37,13 +38,13 @@ export default function Header() {
   };
 
   const login = () => {
-    localStorage.setItem("token", TOKEN);
-    setLoggedIn(TOKEN);
+    setUser(USER);
+    localStorage.setItem("user", JSON.stringify(USER));
   };
 
   const signout = () => {
-    localStorage.removeItem("token");
-    setLoggedIn("");
+    localStorage.removeItem("user");
+    setUser(null);
     setAnchorEl(null);
   };
 
@@ -61,7 +62,7 @@ export default function Header() {
           variant="outlined"
           icon={<SearchIcon sx={{ color: "white" }} />}
         />
-        {!loggedIn ? (
+        {!user ? (
           <Button onClick={login} customstyle="light">
             Login
           </Button>

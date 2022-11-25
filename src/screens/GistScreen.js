@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import { Typography, Card, CircularProgress } from "@mui/material";
 import UserInfo from "../components/UserInfo/UserInfo";
 import DeleteIcon from "@mui/icons-material/Delete";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarIcon from "@mui/icons-material/Star";
 import ArrowsBox from "../components/ArrowsBox/ArrowsBox";
-import { useParams } from "react-router-dom";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 
 const GistScreenContainer = styled.div`
   display: grid;
@@ -93,36 +94,32 @@ const CenterDiv = styled.div`
   align-items: center;
 `;
 
-export default function GistScreen({ gistDetails }) {
+export default function GistScreen() {
   const [filecontent, setFileContent] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  // useEffect(() => {
-  //   getGistDetails();
-  // }, []);
+  const [starred, setStarred] = useState(false);
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  const { files, owner, id } = state;
 
-  // const getGistDetails = async () => {
-  //   setLoading(true);
-  //   const response = await axios.get(`https://api.github.com/gists/${gistID}`);
-  //   console.log(response);
-  //   setGist(response.data);
-  //   setLoading(false);
-  // };
+  const { user } = useContext(UserContext);
 
   const formatFileContent = (content) => {
-    return content.split(/\r?\n/);
+    return JSON.stringify(content, null, 2).split(/\r?\n/);
   };
 
   useEffect(() => {
+    isGistStarred(id);
     getFileContent();
   }, []);
 
   const getFileContent = async () => {
-    if (gistDetails) {
+    if (state) {
       setLoading(true);
       try {
-        const filename = Object.keys(gistDetails.files)[0];
-        const response = await axios.get(gistDetails.files[filename].raw_url);
+        const filename = Object.keys(files)[0];
+        const response = await axios.get(files[filename].raw_url);
         const result = formatFileContent(response.data);
         setFileContent(result);
       } catch (e) {
@@ -132,8 +129,7 @@ export default function GistScreen({ gistDetails }) {
     }
   };
 
-  const filename = Object.keys(gistDetails.files)[0];
-  //const filecontent = formatFileContent(gistDetails.files[filename]);
+  const filename = Object.keys(files)[0];
 
   const displayFileContent = () => {
     if (error) {
@@ -143,16 +139,121 @@ export default function GistScreen({ gistDetails }) {
         </CenterDiv>
       );
     } else if (filecontent.length > 0) {
-      return filecontent.map((line, index) => {
-        return (
-          <FlexDiv>
-            {" "}
-            <LineNumberText>{index + 1}</LineNumberText>
-            <StyledText>{line}</StyledText>
-          </FlexDiv>
-        );
-      });
+      return React.Children.toArray(
+        filecontent.map((line, index) => {
+          return (
+            <FlexDiv>
+              {" "}
+              <LineNumberText>{index + 1}</LineNumberText>
+              <StyledText>{line}</StyledText>
+            </FlexDiv>
+          );
+        })
+      );
     }
+  };
+
+  const config = {
+    headers: { authorization: `token ${user?.token}` },
+  };
+
+  const deleteGist = async (gistID) => {
+    const response = await axios.delete(
+      `https://api.github.com/gists/${gistID}`,
+      config
+    );
+    if (response.status === 204) {
+      navigate("/");
+    }
+  };
+
+  const toggleStar = async (gistID) => {
+    if (!starred) {
+      const response = await axios.put(
+        `https://api.github.com/gists/${gistID}/star`,
+        {
+          gist_id: gistID,
+        },
+        config
+      );
+      setStarred(true);
+    } else {
+      const response = await axios.delete(
+        `https://api.github.com/gists/${gistID}/star`,
+        config
+      );
+      setStarred(false);
+    }
+  };
+
+  const isGistStarred = async (gistID) => {
+    try {
+      const response = await axios.get(
+        `https://api.github.com/gists/${gistID}/star`,
+        config
+      );
+      if (response.status === 204) {
+        setStarred(true);
+      }
+    } catch (error) {
+      setStarred(false);
+    }
+  };
+
+  const showGistActions = () => {
+    return user ? (
+      <HeaderRightDiv>
+        {user.username === owner.login && (
+          <>
+            {" "}
+            <EachDiv>
+              <DeleteIcon sx={{ color: "#0C76FF" }} />
+              <Typography color={"#0C76FF"}>Edit</Typography>
+            </EachDiv>
+            <EachDiv onClick={() => deleteGist(id)}>
+              <DeleteIcon sx={{ color: "#0C76FF" }} />
+              <Typography color={"#0C76FF"}>Delete</Typography>
+            </EachDiv>
+          </>
+        )}
+        <EachDiv onClick={() => toggleStar(id)}>
+          {starred ? (
+            <StarIcon sx={{ color: "#0C76FF" }} />
+          ) : (
+            <StarBorderIcon sx={{ color: "#0C76FF" }} />
+          )}
+          <Typography color={"#0C76FF"}>Star</Typography>
+          <BorderedDiv>
+            <Typography
+              sx={{
+                fontSize: ".9em",
+                margin: "0.2em 0 0 0",
+                padding: 0,
+                color: "#787a79",
+              }}
+            >
+              {starred ? 1 : 0}
+            </Typography>
+          </BorderedDiv>
+        </EachDiv>
+        <EachDiv>
+          <StarBorderIcon sx={{ color: "#0C76FF" }} />
+          <Typography color={"#0C76FF"}>Fork</Typography>
+          <BorderedDiv>
+            <Typography
+              sx={{
+                fontSize: ".9em",
+                margin: "0.2em 0 0 0",
+                padding: 0,
+                color: "#787a79",
+              }}
+            >
+              0
+            </Typography>
+          </BorderedDiv>
+        </EachDiv>
+      </HeaderRightDiv>
+    ) : null;
   };
 
   return loading ? (
@@ -160,49 +261,8 @@ export default function GistScreen({ gistDetails }) {
   ) : (
     <GistScreenContainer>
       <StyledHeaderDiv>
-        <UserInfo item={gistDetails} />
-        <HeaderRightDiv>
-          <EachDiv>
-            <DeleteIcon sx={{ color: "#0C76FF" }} />
-            <Typography color={"#0C76FF"}>Edit</Typography>
-          </EachDiv>
-          <EachDiv>
-            <DeleteIcon sx={{ color: "#0C76FF" }} />
-            <Typography color={"#0C76FF"}>Delete</Typography>
-          </EachDiv>
-          <EachDiv>
-            <StarBorderIcon sx={{ color: "#0C76FF" }} />
-            <Typography color={"#0C76FF"}>Star</Typography>
-            <BorderedDiv>
-              <Typography
-                sx={{
-                  fontSize: ".9em",
-                  margin: "0.2em 0 0 0",
-                  padding: 0,
-                  color: "#787a79",
-                }}
-              >
-                0
-              </Typography>
-            </BorderedDiv>
-          </EachDiv>
-          <EachDiv>
-            <StarBorderIcon sx={{ color: "#0C76FF" }} />
-            <Typography color={"#0C76FF"}>Fork</Typography>
-            <BorderedDiv>
-              <Typography
-                sx={{
-                  fontSize: ".9em",
-                  margin: "0.2em 0 0 0",
-                  padding: 0,
-                  color: "#787a79",
-                }}
-              >
-                0
-              </Typography>
-            </BorderedDiv>
-          </EachDiv>
-        </HeaderRightDiv>
+        <UserInfo item={state} />
+        {showGistActions()}
       </StyledHeaderDiv>
       <StyledGistCard elevation={5}>
         <CardHeader>
