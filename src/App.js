@@ -26,10 +26,7 @@ function App() {
               path="/create"
               element={<Protected Component={CreateGist} />}
             />
-            <Route
-              path="/profile"
-              element={<Protected Component={UserProfile} />}
-            />
+            <Route path="/profile" element={<UserProfile />} />
             <Route path="/gistdetails" element={<GistScreen />} />
           </Routes>
         </SearchContext.Provider>

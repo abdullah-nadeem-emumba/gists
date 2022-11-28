@@ -78,6 +78,7 @@ export default function GistCard({ item, onCardClick }) {
   };
 
   const formatFileContent = (content) => {
+    if (typeof content === "string") return content.split(/\r?\n/);
     return JSON.stringify(content, null, 2).split(/\r?\n/);
   };
 

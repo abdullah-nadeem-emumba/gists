@@ -87,6 +87,7 @@ const FlexDiv = styled.div`
   column-gap: 1.2em;
   overflow: hidden;
   max-height: 1.5em;
+  overflow-x: auto;
 `;
 
 const CenterDiv = styled.div`

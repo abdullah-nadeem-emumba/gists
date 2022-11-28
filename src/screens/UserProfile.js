@@ -6,12 +6,11 @@ import axios from "axios";
 import { UserContext } from "../contexts/UserContext";
 import Header from "../layout/Header/Header";
 import Container from "../layout/AppContainer/Container";
+import { useLocation } from "react-router-dom";
 
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: 0.8fr 1fr;
-
-  /* height: 50em; */
   border-bottom: 1px solid lightgray;
 `;
 
@@ -41,16 +40,27 @@ const CenterDiv = styled.div`
 export default function UserProfile() {
   const [gists, setGists] = useState([]);
   const { user } = useContext(UserContext);
+  const { state } = useLocation();
+
   const owner = gists.length > 0 && gists[0].owner;
+
+  console.log(state);
   useEffect(() => {
     getUserGists();
   }, []);
 
   const getUserGists = async () => {
-    const response = await axios.get(
-      `https://api.github.com/users/${user?.username}/gists`
-    );
-    setGists(response.data);
+    if (state) {
+      const response = await axios.get(
+        `https://api.github.com/users/${state.owner.login}/gists`
+      );
+      setGists(response.data);
+    } else {
+      const response = await axios.get(
+        `https://api.github.com/users/${user?.username}/gists`
+      );
+      setGists(response.data);
+    }
   };
 
   const listGists = () => {
@@ -69,10 +79,12 @@ export default function UserProfile() {
           <LeftDiv>
             <CenterDiv>
               <Avatar
-                src={owner.avatar_url}
+                src={state?.owner?.avatar_url || owner?.avatar_url}
                 sx={{ width: "12em", height: "12em", marginBottom: "1.7em" }}
               />
-              <Typography variant="h5">{owner.login}</Typography>
+              <Typography variant="h5">
+                {state?.owner?.login || owner.login}
+              </Typography>
               <Button
                 variant="outlined"
                 sx={{

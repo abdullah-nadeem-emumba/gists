@@ -61,6 +61,7 @@ const FlexDiv = styled.div`
   column-gap: 1.2em;
   overflow: hidden;
   max-height: 1.5em;
+  overflow-x: auto;
 `;
 
 const CenterDiv = styled.div`
@@ -78,6 +79,7 @@ export default function UserGist({ item }) {
   const [starred, setStarred] = useState(false);
   const { user } = useContext(UserContext);
   const formatFileContent = (content) => {
+    if (typeof content === "string") return content.split(/\r?\n/);
     return JSON.stringify(content, null, 2).split(/\r?\n/);
   };
 
@@ -171,44 +173,46 @@ export default function UserGist({ item }) {
     <>
       <UpperDiv>
         <UserInfo item={item} />
-        <StyledDiv>
-          <EachDiv onClick={() => toggleStar(item.id)}>
-            {starred ? (
-              <StarIcon sx={{ color: "#0C76FF" }} />
-            ) : (
+        {user && (
+          <StyledDiv>
+            <EachDiv onClick={() => toggleStar(item.id)}>
+              {starred ? (
+                <StarIcon sx={{ color: "#0C76FF" }} />
+              ) : (
+                <StarBorderIcon sx={{ color: "#0C76FF" }} />
+              )}
+              <Typography color={"#0C76FF"}>Star</Typography>
+              <BorderedDiv>
+                <Typography
+                  sx={{
+                    fontSize: ".9em",
+                    margin: "0.2em 0 0 0",
+                    padding: 0,
+                    color: "#787a79",
+                  }}
+                >
+                  {starred ? 1 : 0}
+                </Typography>
+              </BorderedDiv>
+            </EachDiv>
+            <EachDiv onClick={() => forkGist(item.id)}>
               <StarBorderIcon sx={{ color: "#0C76FF" }} />
-            )}
-            <Typography color={"#0C76FF"}>Star</Typography>
-            <BorderedDiv>
-              <Typography
-                sx={{
-                  fontSize: ".9em",
-                  margin: "0.2em 0 0 0",
-                  padding: 0,
-                  color: "#787a79",
-                }}
-              >
-                {starred ? 1 : 0}
-              </Typography>
-            </BorderedDiv>
-          </EachDiv>
-          <EachDiv onClick={() => forkGist(item.id)}>
-            <StarBorderIcon sx={{ color: "#0C76FF" }} />
-            <Typography color={"#0C76FF"}>Fork</Typography>
-            <BorderedDiv>
-              <Typography
-                sx={{
-                  fontSize: ".9em",
-                  margin: "0.2em 0 0 0",
-                  padding: 0,
-                  color: "#787a79",
-                }}
-              >
-                0
-              </Typography>
-            </BorderedDiv>
-          </EachDiv>
-        </StyledDiv>
+              <Typography color={"#0C76FF"}>Fork</Typography>
+              <BorderedDiv>
+                <Typography
+                  sx={{
+                    fontSize: ".9em",
+                    margin: "0.2em 0 0 0",
+                    padding: 0,
+                    color: "#787a79",
+                  }}
+                >
+                  0
+                </Typography>
+              </BorderedDiv>
+            </EachDiv>
+          </StyledDiv>
+        )}
       </UpperDiv>
       <StyledCard elevation={3}>{displayFileContent()}</StyledCard>
     </>

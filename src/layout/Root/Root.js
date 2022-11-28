@@ -47,14 +47,13 @@ export default function Root({ Header, screenName }) {
   }, []);
 
   const config = {
-    headers: { authorization: `token ${user.token}` },
+    headers: { authorization: `token ${user?.token}` },
   };
 
   const getGists = async () => {
     setLoading(true);
     const response = await axios.get(
-      `https://api.github.com/gists/public?per_page=9&page=${page}`,
-      config
+      `https://api.github.com/gists/public?per_page=9&page=${page}`
     );
     console.log(response);
     const data = response.data;

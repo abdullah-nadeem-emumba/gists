@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Avatar, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const GistInfoDiv = styled.div`
   display: flex;
@@ -15,6 +16,15 @@ const StyledSpan = styled.span`
 
 export default function UserInfo({ item }) {
   const filename = Object.keys(item.files)[0];
+  const navigate = useNavigate();
+
+  const openUserDetails = () => {
+    navigate("/profile", {
+      state: {
+        owner: item.owner,
+      },
+    });
+  };
 
   return (
     <GistInfoDiv>
@@ -23,7 +33,11 @@ export default function UserInfo({ item }) {
         sx={{ width: "3.1em", height: "3.1em" }}
       />
       <div>
-        <Typography align="left" sx={{ color: "#0C76FF", fontWeight: 700 }}>
+        <Typography
+          onClick={openUserDetails}
+          align="left"
+          sx={{ color: "#0C76FF", fontWeight: 700, cursor: "pointer" }}
+        >
           {item.owner.login} / {filename}
           <StyledSpan></StyledSpan>
         </Typography>
