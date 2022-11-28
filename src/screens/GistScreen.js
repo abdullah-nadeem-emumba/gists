@@ -5,10 +5,13 @@ import UserInfo from "../components/UserInfo/UserInfo";
 import DeleteIcon from "@mui/icons-material/Delete";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarIcon from "@mui/icons-material/Star";
+import EditIcon from "@mui/icons-material/Edit";
 import ArrowsBox from "../components/ArrowsBox/ArrowsBox";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
+import Header from "../layout/Header/Header";
+import Container from "../layout/AppContainer/Container";
 
 const GistScreenContainer = styled.div`
   display: grid;
@@ -178,7 +181,7 @@ export default function GistScreen() {
 
   const toggleStar = async (gistID) => {
     if (!starred) {
-      const response = await axios.put(
+      await axios.put(
         `https://api.github.com/gists/${gistID}/star`,
         {
           gist_id: gistID,
@@ -187,10 +190,7 @@ export default function GistScreen() {
       );
       setStarred(true);
     } else {
-      const response = await axios.delete(
-        `https://api.github.com/gists/${gistID}/star`,
-        config
-      );
+      await axios.delete(`https://api.github.com/gists/${gistID}/star`, config);
       setStarred(false);
     }
   };
@@ -222,7 +222,7 @@ export default function GistScreen() {
           <>
             {" "}
             <EachDiv onClick={editGist}>
-              <DeleteIcon sx={{ color: "#0C76FF" }} />
+              <EditIcon sx={{ color: "#0C76FF" }} />
               <Typography color={"#0C76FF"}>Edit</Typography>
             </EachDiv>
             <EachDiv onClick={() => deleteGist(id)}>
@@ -274,18 +274,23 @@ export default function GistScreen() {
   return loading ? (
     <CircularProgress />
   ) : (
-    <GistScreenContainer>
-      <StyledHeaderDiv>
-        <UserInfo item={state} />
-        {showGistActions()}
-      </StyledHeaderDiv>
-      <StyledGistCard elevation={5}>
-        <CardHeader>
-          <ArrowsBox />
-          <Typography color={"#0C76FF"}>{filename}</Typography>
-        </CardHeader>
-        <CardContent>{displayFileContent()}</CardContent>
-      </StyledGistCard>
-    </GistScreenContainer>
+    <div>
+      <Header />
+      <Container>
+        <GistScreenContainer>
+          <StyledHeaderDiv>
+            <UserInfo item={state} />
+            {showGistActions()}
+          </StyledHeaderDiv>
+          <StyledGistCard elevation={5}>
+            <CardHeader>
+              <ArrowsBox />
+              <Typography color={"#0C76FF"}>{filename}</Typography>
+            </CardHeader>
+            <CardContent>{displayFileContent()}</CardContent>
+          </StyledGistCard>
+        </GistScreenContainer>
+      </Container>
+    </div>
   );
 }

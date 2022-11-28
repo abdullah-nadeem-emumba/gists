@@ -7,6 +7,8 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { USER } from "../constants/constants";
 import { useNavigate, useLocation } from "react-router-dom";
+import Container from "../layout/AppContainer/Container";
+import Header from "../layout/Header/Header";
 
 const FormContainer = styled.div`
   margin-top: 3em;
@@ -27,8 +29,6 @@ const StyledDiv = styled.div`
 export default function CreateGist() {
   const navigate = useNavigate();
   const { state } = useLocation();
-
-  console.log("State", state);
 
   const validationSchema = Yup.object({
     filename: Yup.string().required("Required"),
@@ -94,55 +94,60 @@ export default function CreateGist() {
   };
 
   return (
-    <Formik
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-      validationSchema={validationSchema}
-    >
-      <Form>
-        <FormContainer>
-          <div>
-            <TextField
-              name={"description"}
-              id={"description"}
-              customstyle="dark"
-              label={"Enter description..."}
-              fullWidth
-              variant={"outlined"}
-              size="small"
-            />
-          </div>
-          <div>
-            <TextField
-              name={"filename"}
-              id={"filename"}
-              customstyle="dark"
-              label={"Enter file name..."}
-              fullWidth
-              variant={"outlined"}
-              size="small"
-            />
-          </div>
-          <div>
-            <TextField
-              name={"content"}
-              id={"content"}
-              customstyle="dark"
-              label={"Enter file content..."}
-              variant={"outlined"}
-              multiline
-              rows={10}
-              fullWidth
-            />
-          </div>
-          <StyledDiv>
-            <Button customstyle="dark">Add File</Button>
-            <Button type={"submit"} customstyle="dark">
-              {state ? "Update Gist" : "Create Gist"}
-            </Button>
-          </StyledDiv>
-        </FormContainer>
-      </Form>
-    </Formik>
+    <div>
+      <Header />
+      <Container>
+        <Formik
+          initialValues={initialValues}
+          onSubmit={onSubmit}
+          validationSchema={validationSchema}
+        >
+          <Form>
+            <FormContainer>
+              <div>
+                <TextField
+                  name={"description"}
+                  id={"description"}
+                  customstyle="dark"
+                  label={"Enter description..."}
+                  fullWidth
+                  variant={"outlined"}
+                  size="small"
+                />
+              </div>
+              <div>
+                <TextField
+                  name={"filename"}
+                  id={"filename"}
+                  customstyle="dark"
+                  label={"Enter file name..."}
+                  fullWidth
+                  variant={"outlined"}
+                  size="small"
+                />
+              </div>
+              <div>
+                <TextField
+                  name={"content"}
+                  id={"content"}
+                  customstyle="dark"
+                  label={"Enter file content..."}
+                  variant={"outlined"}
+                  multiline
+                  rows={10}
+                  fullWidth
+                />
+              </div>
+              <StyledDiv>
+                <Button customstyle="dark">Add File</Button>
+                <Button type={"submit"} customstyle="dark">
+                  {state ? "Update Gist" : "Create Gist"}
+                </Button>
+              </StyledDiv>
+            </FormContainer>
+          </Form>
+        </Formik>
+      </Container>
+    </div>
   );
 }

@@ -15,6 +15,7 @@ const StyledSpan = styled.span`
 
 export default function UserInfo({ item }) {
   const filename = Object.keys(item.files)[0];
+
   return (
     <GistInfoDiv>
       <Avatar

@@ -21,10 +21,7 @@ function App() {
       <UserContext.Provider value={providerValue}>
         <SearchContext.Provider value={{ searchResult, setSearchResult }}>
           <Routes>
-            <Route
-              path="/"
-              element={<Root Header={Header} Content={LandingScreen} />}
-            />
+            <Route path="/" element={<Root Header={Header} />} />
             <Route
               path="/create"
               element={<Protected Component={CreateGist} />}

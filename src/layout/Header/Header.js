@@ -27,11 +27,15 @@ const StyledLink = styled(Link)`
   color: unset;
 `;
 
-export default function Header() {
+export default function Header({
+  searchVal,
+  handleSearch,
+  handleSearchChange,
+  handleKeyPress,
+}) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [searchVal, setSearchVal] = useState("");
   const { user, setUser } = useContext(UserContext);
-  const { searchResult, setSearchResult } = useContext(SearchContext);
+  // const { searchResult, setSearchResult } = useContext(SearchContext);
   const open = Boolean(anchorEl);
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -51,17 +55,17 @@ export default function Header() {
     setAnchorEl(null);
   };
 
-  const getUserGists = async () => {
-    try {
-      const response = await axios.get(
-        `https://api.github.com/users/${searchVal}/gists`
-      );
-      console.log(response);
-      setSearchResult(response.data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  // const getUserGists = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://api.github.com/users/${searchVal}/gists`
+  //     );
+  //     console.log(response);
+  //     setSearchResult(response.data);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
 
   return (
     <StyledHeader>
@@ -73,8 +77,9 @@ export default function Header() {
       <RightDiv>
         <SearchField
           value={searchVal}
-          onChange={(e) => setSearchVal(e.target.value)}
-          handleSearch={getUserGists}
+          onChange={handleSearchChange}
+          handleSearch={handleSearch}
+          handleKeyPress={handleKeyPress}
           customstyle="light"
           label="Search Notes..."
           variant="outlined"

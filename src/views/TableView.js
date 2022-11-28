@@ -32,6 +32,12 @@ const StyledTableCell = styled(TableCell)`
   && {
     color: #a7a7a7;
   }
+  &.notebook-name {
+    max-width: 5em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 const FlexDiv = styled.div`
@@ -43,6 +49,15 @@ const FlexDiv = styled.div`
 export default function TableView({ gists, onRowClick }) {
   const { user } = useContext(UserContext);
 
+  const displayFileNames = (filesArr) => {
+    return filesArr.map((file, i) => {
+      return (
+        <span>
+          {file} {filesArr.length > 1 ? " / " : ""}{" "}
+        </span>
+      );
+    });
+  };
   return (
     <>
       <TableContainer sx={{ marginTop: "2em" }} component={Paper}>
@@ -67,8 +82,10 @@ export default function TableView({ gists, onRowClick }) {
               gists &&
                 gists.length > 0 &&
                 gists.map((row) => {
+                  const filenames = Object.keys(row.files);
                   const date = moment(row.created_at).format("D MMM YYYY");
                   const time = moment(row.created_at).format("h:mm A");
+
                   return (
                     <TableRow
                       sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -95,7 +112,9 @@ export default function TableView({ gists, onRowClick }) {
                       <StyledTableCell>{date}</StyledTableCell>
                       <StyledTableCell>{time}</StyledTableCell>
                       <StyledTableCell>{"WebServer"}</StyledTableCell>
-                      <StyledTableCell>{row.notebook}</StyledTableCell>
+                      <StyledTableCell className="notebook-name">
+                        {displayFileNames(filenames)}
+                      </StyledTableCell>
                       <StyledTableCell>
                         {user && <TableStar id={row.id} />}
                       </StyledTableCell>

@@ -1,5 +1,5 @@
 import React from "react";
-import { InputAdornment } from "@mui/material";
+import { InputAdornment, IconButton } from "@mui/material";
 import styled from "styled-components";
 import TextField from "@mui/material/TextField";
 import SearchIcon from "@mui/icons-material/Search";
@@ -45,6 +45,7 @@ export default function SearchField({
   variant,
   placeholder,
   handleSearch,
+  handleKeyPress,
 }) {
   return (
     <FieldWrapper>
@@ -55,6 +56,7 @@ export default function SearchField({
         label={label}
         variant={variant}
         placeholder={placeholder}
+        onKeyPress={handleKeyPress}
       />
       <SearchIcon
         onClick={handleSearch}

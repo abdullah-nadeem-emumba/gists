@@ -43,10 +43,7 @@ export default function Star({ id }) {
 
   const unStarGist = async (gistID) => {
     setStarred(false);
-    const response = await axios.delete(
-      `https://api.github.com/gists/${gistID}/star`,
-      config
-    );
+    await axios.delete(`https://api.github.com/gists/${gistID}/star`, config);
   };
 
   return starred ? (

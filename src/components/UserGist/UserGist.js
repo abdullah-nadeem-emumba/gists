@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import UserInfo from "../UserInfo/UserInfo";
 import styled from "styled-components";
 import { Typography, Card } from "@mui/material";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarIcon from "@mui/icons-material/Star";
 import axios from "axios";
+import { UserContext } from "../../contexts/UserContext";
 
 const UpperDiv = styled.div`
   display: flex;
@@ -73,13 +75,15 @@ export default function UserGist({ item }) {
   const [filecontent, setFileContent] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+  const [starred, setStarred] = useState(false);
+  const { user } = useContext(UserContext);
   const formatFileContent = (content) => {
     return JSON.stringify(content, null, 2).split(/\r?\n/);
   };
 
   useEffect(() => {
     getFileContent();
+    isGistStarred(item.id);
   }, []);
 
   const getFileContent = async () => {
@@ -95,6 +99,51 @@ export default function UserGist({ item }) {
       }
       setLoading(false);
     }
+  };
+
+  const config = {
+    headers: { authorization: `token ${user?.token}` },
+  };
+
+  const toggleStar = async (gistID) => {
+    if (!starred) {
+      const response = await axios.put(
+        `https://api.github.com/gists/${gistID}/star`,
+        {
+          gist_id: gistID,
+        },
+        config
+      );
+      setStarred(true);
+    } else {
+      const response = await axios.delete(
+        `https://api.github.com/gists/${gistID}/star`,
+        config
+      );
+      setStarred(false);
+    }
+  };
+
+  const isGistStarred = async (gistID) => {
+    try {
+      const response = await axios.get(
+        `https://api.github.com/gists/${gistID}/star`,
+        config
+      );
+      if (response.status === 204) {
+        setStarred(true);
+      }
+    } catch (error) {
+      setStarred(false);
+    }
+  };
+
+  const forkGist = async (gistID) => {
+    const response = await axios.post(
+      `https://api.github.com/gists/${gistID}/forks`,
+      config
+    );
+    console.log(response);
   };
 
   const displayFileContent = () => {
@@ -123,8 +172,12 @@ export default function UserGist({ item }) {
       <UpperDiv>
         <UserInfo item={item} />
         <StyledDiv>
-          <EachDiv>
-            <StarBorderIcon sx={{ color: "#0C76FF" }} />
+          <EachDiv onClick={() => toggleStar(item.id)}>
+            {starred ? (
+              <StarIcon sx={{ color: "#0C76FF" }} />
+            ) : (
+              <StarBorderIcon sx={{ color: "#0C76FF" }} />
+            )}
             <Typography color={"#0C76FF"}>Star</Typography>
             <BorderedDiv>
               <Typography
@@ -135,11 +188,11 @@ export default function UserGist({ item }) {
                   color: "#787a79",
                 }}
               >
-                0
+                {starred ? 1 : 0}
               </Typography>
             </BorderedDiv>
           </EachDiv>
-          <EachDiv>
+          <EachDiv onClick={() => forkGist(item.id)}>
             <StarBorderIcon sx={{ color: "#0C76FF" }} />
             <Typography color={"#0C76FF"}>Fork</Typography>
             <BorderedDiv>
